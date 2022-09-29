@@ -1,4 +1,5 @@
 use std::fs::File;
+use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::path::Path;
 // use std::env;
@@ -49,36 +50,52 @@ fn get_imports(code_file: Vec<String>) -> Vec<String>{
 }
 
 fn write_imports_section(imports: Vec<String>){
-
-    let mut example_new_file = File::open(r"C:\Users\owenh\OneDrive\Documents\Coding\Projects\auto_doc\test_files\test_text.txt").expect("Cannot create file");
+    let mut example_new_file = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(r"C:\Users\owenh\OneDrive\Documents\Coding\Projects\auto_doc\test_files\test_text.md")
+        .unwrap();
     let builtins = module_descriptions();
+    if let Err(e) = writeln!(example_new_file, 
+        "# Imports and Import Aliases"
+    ){eprintln!("Couldn't write to file: {}", e);}
 
     for line in imports.iter(){
         let format = line.split(' ').collect::<Vec<&str>>();
-        
-
-        
-        match format[0] {
-            "import" => print!("Found Import {}", format[1]),
-            "from" => print!("Found Import {}", format[1]),
-            _ => panic!("Function: get_imports is Producing bad data"),
+        if builtins.contains_key(format[1]){
+            match format[0] {
+                "import" => if let Err(e) = writeln!(example_new_file, 
+                    "`{}` - Where [[{}]] is '{}'", format.join(" "), format[1], builtins.get(format[1]).unwrap()
+                )
+                {eprintln!("Couldn't write to file: {}", e);},
+    
+                "from" => if let Err(e) = writeln!(example_new_file, 
+                    "`{}` - Where [[{}]] is '{}', and {} is defined [[Filename @todo|here]]", format.join(" "),format[1], builtins.get(format[1]).unwrap(), format[3]
+                )
+                {eprintln!("Couldn't write to file: {}", e);},
+                _ => panic!("Function: get_imports is Producing bad data"),
+            }
+        }else{
+            match format[0] {
+                "import" => if let Err(e) = writeln!(example_new_file, 
+                    "`{}` - Where [[{}]] is user defined", format.join(" "), format[1]
+                )
+                {eprintln!("Couldn't write to file: {}", e);},
+    
+                "from" => if let Err(e) = writeln!(example_new_file, 
+                    "`{}` - Where [[{}]] is user defined [[{}#{}|here]]", format.join(" "), format[1], format[1], format[3]
+                )
+                {eprintln!("Couldn't write to file: {}", e);},
+                _ => panic!("Function: get_imports is Producing bad data"),
+            }
         }
-        if builtins.contains_key(&format[1].to_string()){println!(" - {:?}", builtins.get(format[1]).unwrap());} 
-        else {println!();}
     }
-    if builtins.contains_key(format[1]){
-        println!("Success");
-        if let Err(e) = writeln!(example_new_file, "{} - {:?}.", format[1], builtins.get(format[1]))  {
-            eprintln!("Couldn't write to file: {}", e);
-        }
-        println!("Firing");
-    example_new_file.write_all(b"This will be in the file").expect("Failed to write to file");
 }
 
 fn module_descriptions() -> HashMap<String, String>{
     let mut module_library = HashMap::new();
 
-    let path = Path::new(r"C:\Users\owenh\OneDrive\Documents\Coding\Projects\auto_doc\test_files\python_builtins_unfiltered.txt");
+    let path = Path::new(r"C:\Users\owenh\OneDrive\Documents\Coding\Projects\auto_doc\test_files\python_builtins.txt");
     let mut descriptions = File::open(path).expect("Can't Open File");
     let mut contents = String::new();
 

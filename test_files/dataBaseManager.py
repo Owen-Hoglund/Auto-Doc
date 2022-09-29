@@ -1,12 +1,14 @@
-import mysql.connector
-import flightProjectHelper as utility
 from operator import itemgetter
-import math as fuck
+import math
 import datetime
+from exampleimportfile import specificfunction
+import flightProjectHelper as utility
+import mysql.connector
+
+
 # Opens the connection to our database
 # ----------------------------------------------------------------------------------------------------------------------------------------------------
 db = mysql.connector.connect(
-    x = datetime
     host = "localhost",
     user = "root",
     passwd = "ExamplePass",
@@ -21,7 +23,7 @@ def initalize_tables():
     # CREATES flightgroup table
     sqlstring = "CREATE TABLE if not exists flightgroups (email VARCHAR(50) NOT NULL, date_lower_bound datetime NOT NULL, date_upper_bound datetime NOT NULL, destination VARCHAR(3) NOT NULL, stayRangeLow int NOT NULL, stayRangeHigh int NOT NULL, PRIMARY KEY(email))"
     cursor.execute(sqlstring)
-    
+
     # Creates flight_group_airport_list table
     sqlstring = "CREATE TABLE if not exists flight_group_airport_list (email VARCHAR(50) NOT NULL, origin_airport VARCHAR(3) NOT NULL, passenger_count int NOT NULL, FOREIGN KEY(email) REFERENCES flightgroups(email))"
     cursor.execute(sqlstring)

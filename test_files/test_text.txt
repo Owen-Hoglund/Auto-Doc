@@ -1,0 +1,4 @@
+- from library/package/module: operator - 'Functions corresponding to the standard operators.', import itemgetter
+- library/package/module: math - 'Mathematical functions (sin() etc.).'
+- library/package/module: datetime - 'Basic date and time types.'
+This will be in the file
