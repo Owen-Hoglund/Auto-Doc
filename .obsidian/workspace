@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "test_files/test_text.md",
+            "file": "test_files/global_variables_section.md",
             "mode": "source",
             "source": false
           }
@@ -77,7 +77,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "test_files/test_text.md",
+                "file": "test_files/global_variables_section.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -94,7 +94,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "test_files/test_text.md",
+                "file": "test_files/global_variables_section.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -117,7 +117,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "test_files/test_text.md"
+                "file": "test_files/global_variables_section.md"
               }
             }
           }
@@ -130,8 +130,15 @@
   },
   "active": "c4d5695b853f4a81",
   "lastOpenFiles": [
-    "exampleimportfile.md",
+    "test_files/quick_reference_definitions.md",
+    "test_files/global_variables_section.md",
+    "db.md",
+    "test_files/quick_reference.md",
     "test_files/test_text.md",
+    "examplefile.md",
+    "utility.md",
+    "exampleimportfile.md",
+    "flightProjectHelper.md",
     "Filename @todo.md"
   ]
 }
