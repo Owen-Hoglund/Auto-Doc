@@ -10,7 +10,7 @@ fn main () {
     // let contents = tools::file_splitter(test_file);
     // outer_parsing::outer_parsing(contents);
     let project_path = r"C:\Users\owenh\OneDrive\Documents\Coding\Projects\auto_doc_test_directory\project_name".to_string();
-    file_control::create_directory(project_path);
+    file_control::receptionist(project_path);
 }
 
 // const RESERVED_WORDS_PYTHON: [&str; 33] = ["False", "def", "if", "raise",
