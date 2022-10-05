@@ -1,5 +1,5 @@
 # Auto-Doc
-A tool for creating code documentation and manuals for software/codefiles
+A tool, written in Rust, for creating code documentation and manuals for software/code files written in Python (for now)
 
 NOTE:
 This is the first thing I've ever written in Rust, my motivation for writing it is equal parts my desire for the product
