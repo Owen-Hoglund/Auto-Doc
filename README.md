@@ -5,7 +5,7 @@ NOTE:
 This is the first thing I've ever written in Rust, my motivation for writing it is equal parts my desire for the product
 and my desire to learn through the process of building something. As such, much of the code will likely be sloppy, not 
 best practice, inefficient, ugly. I am doing my best to avoid this but I have very little exposure to the language. Should
-anyone review this, feel free to tell me what I've done wrong, what could be better. Cheers. 
+anyone review this, feel free to tell me what I've done wrong, what could be better. Cheers.
 
 While I have learned to code, one thing I have taken away is that when looking at other peoples code, even if it is well-commented,
 it can be very difficult to understand what a given function, file, class, etc,. does in the context of the *entire* project. It was 
