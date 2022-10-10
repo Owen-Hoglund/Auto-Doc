@@ -44,7 +44,8 @@ pub fn outer_parsing(original_file_path: &String, guide_file: &String, project_f
                 open_storage.clear();
 
     let imports = auto_doc_utility::expanded_imports(code_imports);
-    let import_map:HashMap<String, String> = write_imports::execute(imports, guide_file, project_folder);
+    let import_map:HashMap<String, String> = write_imports::execute(imports, &guide_file, project_folder);
+    write_functions::execute(code_functions, guide_file, &import_map);
     //write_global_variables::execute(code_global_variables, guide_file);
 }
 

@@ -37,8 +37,12 @@ fn populate_hashmap(import_map: &mut HashMap<String,String>, imports: &Vec<Strin
         let temp = python_source_to_path(&source, project_folder);
         let source_path= Path::new(&temp);
         if source_path.exists() {
-            //println!("{}", import);
-            let key = source.clone();
+            let mut key:String = String::new();
+            if alias.is_empty(){
+                key = source.clone();
+            } else{
+                key = alias.clone()
+            }
             let value = internal_link_generator(&import_source_to_obsidian_path(&source), &alias, &specific);
             //println!("key: {}\nValue: {}\n", key, value);
             import_map.insert(key, value);
@@ -86,9 +90,22 @@ fn write_imports(import_map: &HashMap<String, String>, guide_file: &String){
     if let Err(e) = writeln!(guide,
         "## Imports"
     ){eprintln!("Couldn't write to file: {}", e);}
-    for mapping in import_map{
-        if let Err(e) = writeln!(guide,
-            "- {}\n", mapping.1,
+    if import_map.is_empty(){
+        if let Err(e) = write!(guide,
+            "This file does not import from any modules or libaries that AutoDoc could detect"
         ){eprintln!("Couldn't write to file: {}", e);}
+    } else{
+        if let Err(e) = write!(guide,
+            "-"
+        ){eprintln!("Couldn't write to file: {}", e);}
+        for mapping in import_map{
+            if let Err(e) = write!(guide,
+                "{}, ", mapping.1,
+            ){eprintln!("Couldn't write to file: {}", e);}
+        }
     }
+    if let Err(e) = write!(guide,
+        "\n"
+    ){eprintln!("Couldn't write to file: {}", e);}
+    
 }
