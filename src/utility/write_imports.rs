@@ -1,104 +1,94 @@
-use std::fs::File;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::path::Path;
-use std::collections::{HashMap};
+use std::collections::HashMap;
 
-pub fn execute(imports_section: Vec<Vec<String>>){
-    let mut imports: Vec<String> = Vec::new();
-    for line in imports_section{
-        imports.push(line[0].clone());
-    }
-
-    // Returns the aliases for each import
-    let  mut import_aliases = get_import_aliases(&imports);
-    println!("{:?}", import_aliases);
-    // Writes the imports section for the current file
-    write_imports_section(imports, &mut import_aliases);
-    //println!("{:?}", contents);
+pub fn execute(imports: Vec<String>, guide_file: &String, project_folder: &String) -> HashMap<String, String>{
+    let mut import_map: HashMap<String, String> = HashMap::new();
+    populate_hashmap(&mut import_map, &imports, project_folder);
+    write_imports(&import_map, &guide_file);
+    import_map
 }
 
-fn write_imports_section(imports: Vec<String>, aliases: &mut HashMap<String, String>){
-    let mut example_new_file = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(r"C:\Users\owenh\OneDrive\Documents\Coding\Projects\auto_doc\test_files\test_text.md")
-        .unwrap();
-    let builtins = module_descriptions();
-    if let Err(e) = writeln!(example_new_file, 
-        "# Imports"
-    ){eprintln!("Couldn't write to file: {}", e);}
-
-    for line in imports.iter(){
-        let format = line.split(' ').collect::<Vec<&str>>();
-        if builtins.contains_key(format[1]){
-            match format[0] {
-                "import" => if let Err(e) = writeln!(example_new_file, 
-                    "`{}` - Where [[{}]] is '{}'", format.join(" "), format[1], builtins.get(format[1]).unwrap()
-                )
-                {eprintln!("Couldn't write to file: {}", e);},
-    
-                "from" => if let Err(e) = writeln!(example_new_file, 
-                    "`{}` - Where [[{}]] is '{}', and {} is defined [[Filename @todo|here]]", format.join(" "),format[1], builtins.get(format[1]).unwrap(), format[3]
-                )
-                {eprintln!("Couldn't write to file: {}", e);},
-                _ => panic!("Function: get_imports is Producing bad data"),
-            }
-        }else{
-            match format[0] {
-                "import" => if let Err(e) = writeln!(example_new_file, 
-                    "`{}` - Where [[{}]] is user defined", format.join(" "), format[1]
-                )
-                {eprintln!("Couldn't write to file: {}", e);},
-    
-                "from" => if let Err(e) = writeln!(example_new_file, 
-                    "`{}` - Where [[{}]] is user defined [[{}#{}|here]]", format.join(" "), format[1], format[1], format[3]
-                )
-                {eprintln!("Couldn't write to file: {}", e);},
-                _ => panic!("Function: get_imports is Producing bad data"),
+fn populate_hashmap(import_map: &mut HashMap<String,String>, imports: &Vec<String>, project_folder: &String){
+    for import in imports{
+        let mut source: String = String::new();
+        let mut specific: String = String::new();
+        let mut alias: String = String::new();
+        let mut builder = import.split_whitespace().peekable();
+        // Traverse the import word by word
+        while builder.peek().is_some() { // Checks if there is a next iteration to get
+            match builder.next().unwrap() {
+                "from" => { // Checks if the import starts with "from", then appropriately assigns source and specific
+                    source = builder.next().unwrap().to_string();
+                    builder.next();
+                    specific = builder.next().unwrap().to_string();
+                },
+                "import" => {
+                    source = builder.next().unwrap().to_string();
+                },
+                "as" => {
+                    alias = builder.next().unwrap().to_string();
+                },
+                _ => (),
             }
         }
+
+        let temp = python_source_to_path(&source, project_folder);
+        let source_path= Path::new(&temp);
+        if source_path.exists() {
+            //println!("{}", import);
+            let key = source.clone();
+            let value = internal_link_generator(&import_source_to_obsidian_path(&source), &alias, &specific);
+            //println!("key: {}\nValue: {}\n", key, value);
+            import_map.insert(key, value);
+        }
     }
-    if let Err(e) = writeln!(example_new_file, 
-        "## Aliases"
+}
+
+
+fn python_source_to_path(import: &String, project_folder: &String) -> String{
+    let x: String = [project_folder.to_string(), import.replace(".", r"\").to_string()].join(r"\");
+    let y = [x, ".py".to_string()].join("");
+    y
+}
+
+fn import_source_to_obsidian_path(import: &String) -> String{
+    import.replace(".", "/")
+}
+
+fn internal_link_generator(path: &String, alias: &String, header: &String) -> String{
+    if header.is_empty(){
+        if alias.is_empty(){
+            format!("[[{}_guide]]", path)
+        }
+        else {
+            format!("[[{}_guide|{}]]", path, alias)
+        }
+    }
+    else {
+        if alias.is_empty(){
+            format!("[[{}_guide#{}]]", path, header)
+        }
+        else {
+            format!("[[{}_guide#{}|{}]]", path, header, alias)
+        }
+    }
+}
+
+fn write_imports(import_map: &HashMap<String, String>, guide_file: &String){
+    let mut guide = OpenOptions::new()
+    .write(true)
+    .append(true)
+    .open(guide_file)
+    .unwrap();
+
+    if let Err(e) = writeln!(guide,
+        "## Imports"
     ){eprintln!("Couldn't write to file: {}", e);}
-    for (key, value) in &*aliases {
-        if let Err(e) = writeln!(example_new_file, 
-            "- [[{}]] as **{}**", value, key
-            //"- [[{}]] as [[{}|{}]]", value, value, key
+    for mapping in import_map{
+        if let Err(e) = writeln!(guide,
+            "- {}\n", mapping.1,
         ){eprintln!("Couldn't write to file: {}", e);}
     }
-
-}
-
-pub fn module_descriptions() -> HashMap<String, String>{
-    let mut module_library = HashMap::new();
-
-    let path = Path::new(r"C:\Users\owenh\OneDrive\Documents\Coding\Projects\auto_doc\test_files\python_builtins.txt");
-    let mut descriptions = File::open(path).expect("Can't Open File");
-    let mut contents = String::new();
-
-    descriptions.read_to_string(&mut contents).expect("Can't Read File");
-
-    let lines = contents.split('\n').collect::<Vec<&str>>();
-
-    for key_value in lines {
-        let key = key_value.split_whitespace().collect::<Vec<&str>>()[0];
-        let value: &str = &key_value.split_whitespace().collect::<Vec<&str>>()[1..].join(" ");
-        //println!("{} - {}", key, value);
-        module_library.insert(key.to_string(), value.to_string());
-    }
-    module_library
-}
-
-
-pub fn get_import_aliases(imp: &Vec<String>) -> HashMap<String, String>{
-    let mut aliases: HashMap<String, String> = HashMap::new();
-    let words = imp.join(" ").split_whitespace().map(|y| y.to_string()).collect::<Vec<String>>();
-    for x in 0..words.len(){
-        if words[x] == "as".to_string(){
-            aliases.insert(words[x + 1].to_string(), words[x - 1].to_string());
-        }
-    }
-    aliases
 }

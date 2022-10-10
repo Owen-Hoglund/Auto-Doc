@@ -880,3 +880,75 @@
 - [[libraryWithAnUngodlyAndUnbearablyLongName]] as **convenience**
 - [[flightProjectHelper]] as **utility**
 - [[examplefile2]] as **examplefile2alias**
+# Imports
+`import mysql.connector` - Where [[mysql.connector]] is user defined
+`import flightProjectHelper as utility` - Where [[flightProjectHelper]] is user defined
+`from operator import itemgetter` - Where [[operator]] is 'Functions corresponding to the standard operators.', and itemgetter is defined [[Filename @todo|here]]
+## Aliases
+- [[flightProjectHelper]] as **utility**
+# Imports
+`from flightGroupClassMk2 import flightGroup` - Where [[flightGroupClassMk2]] is user defined [[flightGroupClassMk2#flightGroup|here]]
+`import random` - Where [[random]] is 'Generate pseudo-random numbers with various common distributions.'
+`from datetime import date, timedelta` - Where [[datetime]] is 'Basic date and time types.', and date, is defined [[Filename @todo|here]]
+`import string` - Where [[string]] is 'Common string operations.'
+`import flightProjectHelper as utility` - Where [[flightProjectHelper]] is user defined
+## Aliases
+- [[flightProjectHelper]] as **utility**
+# Imports
+## Aliases
+# Imports
+`from datetime import date, timedelta, datetime` - Where [[datetime]] is 'Basic date and time types.', and date, is defined [[Filename @todo|here]]
+`import random` - Where [[random]] is 'Generate pseudo-random numbers with various common distributions.'
+## Aliases
+# Imports
+`import mysql.connector` - Where [[mysql.connector]] is user defined
+`import flightProjectHelper as utility` - Where [[flightProjectHelper]] is user defined
+`from operator import itemgetter` - Where [[operator]] is 'Functions corresponding to the standard operators.', and itemgetter is defined [[Filename @todo|here]]
+## Aliases
+- [[flightProjectHelper]] as **utility**
+# Imports
+`from flightGroupClassMk2 import flightGroup` - Where [[flightGroupClassMk2]] is user defined [[flightGroupClassMk2#flightGroup|here]]
+`import random` - Where [[random]] is 'Generate pseudo-random numbers with various common distributions.'
+`from datetime import date, timedelta` - Where [[datetime]] is 'Basic date and time types.', and date, is defined [[Filename @todo|here]]
+`import string` - Where [[string]] is 'Common string operations.'
+`import flightProjectHelper as utility` - Where [[flightProjectHelper]] is user defined
+## Aliases
+- [[flightProjectHelper]] as **utility**
+# Imports
+## Aliases
+# Imports
+`from datetime import date, timedelta, datetime` - Where [[datetime]] is 'Basic date and time types.', and date, is defined [[Filename @todo|here]]
+`import random` - Where [[random]] is 'Generate pseudo-random numbers with various common distributions.'
+## Aliases
+# Imports
+`import dataBaseManager` - Where [[dataBaseManager]] is user defined
+`import setup` - Where [[setup]] is user defined
+## Aliases
+# Imports
+## Aliases
+# Imports
+`import mysql.connector` - Where [[mysql.connector]] is user defined
+`import flightProjectHelper as utility` - Where [[flightProjectHelper]] is user defined
+`from operator import itemgetter` - Where [[operator]] is 'Functions corresponding to the standard operators.', and itemgetter is defined [[Filename @todo|here]]
+## Aliases
+- [[flightProjectHelper]] as **utility**
+# Imports
+`from flightGroupClassMk2 import flightGroup` - Where [[flightGroupClassMk2]] is user defined [[flightGroupClassMk2#flightGroup|here]]
+`import random` - Where [[random]] is 'Generate pseudo-random numbers with various common distributions.'
+`from datetime import date, timedelta` - Where [[datetime]] is 'Basic date and time types.', and date, is defined [[Filename @todo|here]]
+`import string` - Where [[string]] is 'Common string operations.'
+`import flightProjectHelper as utility` - Where [[flightProjectHelper]] is user defined
+## Aliases
+- [[flightProjectHelper]] as **utility**
+# Imports
+## Aliases
+# Imports
+`from datetime import date, timedelta, datetime` - Where [[datetime]] is 'Basic date and time types.', and date, is defined [[Filename @todo|here]]
+`import random` - Where [[random]] is 'Generate pseudo-random numbers with various common distributions.'
+## Aliases
+# Imports
+`import dataBaseManager` - Where [[dataBaseManager]] is user defined
+`import setup` - Where [[setup]] is user defined
+## Aliases
+# Imports
+## Aliases

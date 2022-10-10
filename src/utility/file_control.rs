@@ -1,6 +1,8 @@
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
+use crate::utility::doctor;
+
 
 pub fn receptionist(project_dir: String) {
     // Parent folder is the folder holding the directory of the project we want to create documentation for
@@ -17,11 +19,13 @@ pub fn receptionist(project_dir: String) {
 
     // This creates a structurally identical directory to the source directory within the documentation directory
     // It does not copy the files, but does create placeholder markdown files for all the codefile, storing path as metadata
-    mimic_directories(&all_files, &parent_folder, &project_name);
+    mimic_directories(&all_files, &parent_folder, &project_name, &project_dir);
+
+
 }
 
 // mimics directories of a file, replacing a parent folder with the documentation folder name 
-fn mimic_directories(files: &Vec<String>, parent_folder: &String, project_name: &String){
+fn mimic_directories(files: &Vec<String>, parent_folder: &String, project_name: &String, project_folder: &String){
     // loops through files in the vector
     for file in files {
         // creates the new altered path (details at function)
@@ -31,7 +35,7 @@ fn mimic_directories(files: &Vec<String>, parent_folder: &String, project_name: 
         new_dir(&new_file_directory).expect("Could Not Create Directory");
 
         // Places new markdown file corresponding to the original file in the new directory 
-        create_file_in_mimicked_directory(&new_file_directory, &file);
+        create_file_in_mimicked_directory(&new_file_directory, &file, project_folder);
     }
 }
 
@@ -51,11 +55,11 @@ fn create_mimicked_path(project_name: &String, parent_folder: &String, file_path
     there is some bug happening here which duplicates backslashes, I couldnt figure out what was causing it
     so I simply do a replace("\\", "\") which does the trick but is inelegant. Would like to solve
 
-    4. We then delete the filename from the end of the directory to avoid creation of a folder titled "codefile.py"
-    */
+    4. We then delete the filename from the end of the directory to avoid creation of a folder titled "codefile.py" */
+
 
     //1
-    let new_path_prefix: String = [parent_folder.to_string(), r"\".to_string(), project_name.to_string(), " Guide".to_string()].join("");
+    let new_path_prefix: String = [parent_folder.to_string(), r"\".to_string(), project_name.to_string(), "_Guide".to_string()].join("");
 
     //2
     let new_file_path_suffix = file_path.replace(parent_folder, "");
@@ -115,29 +119,32 @@ fn get_project_name(directory: &String) -> String {
 // This creates the folder that will hold all of our documentation for a given project
 // It stores it in the same directory as the project and titles it "Project123 Guide"
 fn documentation_directory_creation(path: &String, project_name: &String) -> std::io::Result<()> {
-    let documentation_directory: String = [path.to_string(), r"\".to_string(), project_name.to_string(), " Guide".to_string()].join("");
+    let documentation_directory: String = [path.to_string(), r"\".to_string(), project_name.to_string(), "_Guide".to_string()].join("");
     fs::create_dir_all(documentation_directory)?;
     Ok(())
 }
 
 // Takes a path and a path for that file and creates a markdown file in that place 
-fn create_file_in_mimicked_directory(file_path: &String, original_file: &String){
+fn create_file_in_mimicked_directory(file_path: &String, original_file: &String, project_folder: &String){
     let filename = filename(original_file);
     let path = [file_path.to_string(), filename.to_string()].join("").replace(".py", "_guide.md");
-    let mut file = OpenOptions::new()
-                            .write(true)
-                            .append(true)
-                            .create_new(true)
-                            .open(path)
-                            .unwrap();
-    if let Err(e) = writeln!(file, 
-        "Path|{}", original_file
-    ){eprintln!("Couldn't write to file: {}", e);}
+    {
+        let mut file = OpenOptions::new()
+                                .write(true)
+                                .append(true)
+                                .create_new(true)
+                                .open(&path)
+                                .unwrap();
+        if let Err(e) = writeln!(file, 
+            "# {}", filename
+        ){eprintln!("Couldn't write to file: {}", e);}
+    }
+    doctor::doctor(&path, original_file, project_folder);
 }
 
 // Creates a new directory for a given path
 fn new_dir(path: &String) -> std::io::Result<()> {
-    println!("{}", path);
+    //println!("{}", path);
     fs::create_dir_all(path)?;
     Ok(())
 }

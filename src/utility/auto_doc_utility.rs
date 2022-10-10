@@ -1,7 +1,7 @@
 use::std::fs::File;
 use::std::io::Read;
 
-pub fn file_splitter(path: String) -> Vec<String>{
+pub fn file_splitter(path: &String) -> Vec<String>{
      // Opens the file that we want to create documentation for
      //let path = Path::new(r"C:\Users\owenh\OneDrive\Documents\Coding\Projects\auto_doc\test_files\dataBaseManager.py");
      let mut example_file = File::open(path).expect("Can't Open File");
@@ -76,4 +76,67 @@ pub fn is_comment(line: &String) -> bool{
           }
     }
     return false;
+}
+
+
+pub fn expanded_imports(imports_section: Vec<Vec<String>>) -> Vec<String>{
+     // Merges the import lines into 1d Vec with each import line comprising an element of the vector
+     let mut temp_imports: Vec<String> = Vec::new();
+     let mut imports: Vec<String> = Vec::new();
+     for line in imports_section{
+          temp_imports.push(line[0].clone());
+     }
+     for line in temp_imports{
+          if line.contains(","){
+               for x in multi_import_splitter(line){
+                    imports.push(x);
+               }
+          }
+          else if line.contains("*"){
+               imports.push(import_all_fixer(&line));
+          }
+          else {
+               imports.push(line);
+          }
+     }
+     imports
+}
+
+fn import_all_fixer(import: &String) -> String{
+     let temp:Vec<String> = import.split_whitespace().map(|x| x.to_string()).rev().collect::<Vec<String>>();
+     println!("{:?}", temp);
+     temp[1..2].join(" ")
+}
+
+fn multi_import_splitter(import: String) -> Vec<String>{
+     let mut result: Vec<String> = Vec::new();
+     let mut x = import.split_whitespace().peekable();
+     //let y = x.peek().unwrap().to_string();
+     let mut source: Vec<String> = Vec::new();
+     if x.peek().unwrap().to_string() == "from"{
+          source.push(x.next().unwrap().to_string());
+          source.push(x.next().unwrap().to_string());
+          let prefix = source.join(" ");
+          while x.peek().is_some(){
+               result.push(
+                    [
+                         prefix.clone(),
+                         x.next().unwrap().to_string().replace(",", "")
+                    ].join(" ")
+               )
+          }
+     }
+     if x.peek().unwrap().to_string() == "import"{
+          let prefix:String = x.next().unwrap().to_string();
+          while x.peek().is_some(){
+               result.push(
+                    [
+                         prefix.clone(),
+                         x.next().unwrap().to_string().replace(",", "")
+                    ].join(" ")
+               )
+          }
+     }
+
+     result
 }

@@ -1,6 +1,9 @@
+use std::collections::HashMap;
+
 use crate::utility::*;
 
-pub fn outer_parsing(content: Vec<String>){
+pub fn outer_parsing(original_file_path: &String, guide_file: &String, project_folder: &String){
+    let content = auto_doc_utility::file_splitter(original_file_path);
     let mut code_global_variables: Vec<Vec<String>> = Vec::new(); // This stores all global variable definitions in the file
     let mut code_imports: Vec<Vec<String>> = Vec::new(); // This stores all import declarations in the file
     let mut code_functions: Vec<Vec<String>> = Vec::new(); // This stores all function definitions in the file
@@ -40,9 +43,9 @@ pub fn outer_parsing(content: Vec<String>){
                 }
                 open_storage.clear();
 
-    //println!("{:?}", code_functions);
-    write_imports::execute(code_imports);
-    write_global_variables::execute(code_global_variables);
+    let imports = auto_doc_utility::expanded_imports(code_imports);
+    let import_map:HashMap<String, String> = write_imports::execute(imports, guide_file, project_folder);
+    //write_global_variables::execute(code_global_variables, guide_file);
 }
 
 

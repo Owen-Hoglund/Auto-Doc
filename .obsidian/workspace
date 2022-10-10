@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Test1/same name.md",
+            "file": "test_files/test_text.md",
             "mode": "preview",
             "source": false
           }
@@ -77,7 +77,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Test1/same name.md",
+                "file": "test_files/test_text.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -94,7 +94,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Test1/same name.md",
+                "file": "test_files/test_text.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -117,7 +117,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Test1/same name.md"
+                "file": "test_files/test_text.md"
               }
             }
           }
@@ -130,10 +130,10 @@
   },
   "active": "c4d5695b853f4a81",
   "lastOpenFiles": [
-    "Test2/same name.md",
-    "Test1/same name.md",
-    "test_files/global_variables_section.md",
     "test_files/quick_reference_definitions.md",
+    "test_files/global_variables_section.md",
+    "Test1/same name.md",
+    "Test2/same name.md",
     "db.md",
     "test_files/quick_reference.md",
     "test_files/test_text.md",
