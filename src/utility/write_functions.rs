@@ -48,7 +48,7 @@ fn write_functions(function: Vec<String>, path: &String, imports: &HashMap<Strin
         "\n"
     ){eprintln!("Couldn't write to file: {}", e);}
     if let Err(e) = writeln!(guide,
-        "```\n{}\n```", contents,
+        "```python\n{}\n```", contents,
     ){eprintln!("Couldn't write to file: {}", e);}
 }
 

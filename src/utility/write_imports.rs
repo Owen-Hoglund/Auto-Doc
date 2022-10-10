@@ -30,7 +30,7 @@ fn populate_hashmap(import_map: &mut HashMap<String,String>, imports: &Vec<Strin
                 "as" => {
                     alias = builder.next().unwrap().to_string();
                 },
-                _ => (),
+                _ => println!("Critical Error, Builder has reached unreachable state"),
             }
         }
 
@@ -41,10 +41,9 @@ fn populate_hashmap(import_map: &mut HashMap<String,String>, imports: &Vec<Strin
             if alias.is_empty(){
                 key = source.clone();
             } else{
-                key = alias.clone()
+                key = alias.clone();
             }
             let value = internal_link_generator(&import_source_to_obsidian_path(&source), &alias, &specific);
-            //println!("key: {}\nValue: {}\n", key, value);
             import_map.insert(key, value);
         }
     }

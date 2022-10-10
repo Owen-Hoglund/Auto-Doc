@@ -104,39 +104,56 @@ pub fn expanded_imports(imports_section: Vec<Vec<String>>) -> Vec<String>{
 
 fn import_all_fixer(import: &String) -> String{
      let temp:Vec<String> = import.split_whitespace().map(|x| x.to_string()).rev().collect::<Vec<String>>();
-     println!("{:?}", temp);
-     temp[1..2].join(" ")
+     //println!("TEST 2: {:?}", temp);
+     let x = temp.join(" ").replace("* ", "").replace(" from", "");
+     //println!("{}", x);
+     x
 }
 
 fn multi_import_splitter(import: String) -> Vec<String>{
-     let mut result: Vec<String> = Vec::new();
-     let mut x = import.split_whitespace().peekable();
-     //let y = x.peek().unwrap().to_string();
-     let mut source: Vec<String> = Vec::new();
-     if x.peek().unwrap().to_string() == "from"{
-          source.push(x.next().unwrap().to_string());
-          source.push(x.next().unwrap().to_string());
-          let prefix = source.join(" ");
-          while x.peek().is_some(){
-               result.push(
-                    [
-                         prefix.clone(),
-                         x.next().unwrap().to_string().replace(",", "")
-                    ].join(" ")
-               )
-          }
+     let mut result:Vec<String> = Vec::new();
+     let y = &import.split_whitespace().map(|x| x.to_string()).collect::<Vec<String>>();
+     let iter = &y[3..];
+     for i in iter{
+          result.push(["from ".to_string(), y[1].to_string(), " import ".to_string(), i.to_string()].join(""));
      }
-     if x.peek().unwrap().to_string() == "import"{
-          let prefix:String = x.next().unwrap().to_string();
-          while x.peek().is_some(){
-               result.push(
-                    [
-                         prefix.clone(),
-                         x.next().unwrap().to_string().replace(",", "")
-                    ].join(" ")
-               )
-          }
-     }
-
      result
 }
+
+
+
+
+
+
+
+
+
+
+// let mut result: Vec<String> = Vec::new();
+// let mut x = import.split_whitespace().peekable();
+// let mut source: Vec<String> = Vec::new();
+// if x.peek().unwrap().to_string() == "from"{
+//      source.push(x.next().unwrap().to_string());
+//      source.push(x.next().unwrap().to_string());
+//      let prefix = source.join(" ");
+//      while x.peek().is_some(){
+//           result.push(
+//                [
+//                     prefix.clone(),
+//                     x.next().unwrap().to_string().replace(",", "")
+//                ].join(" ")
+//           )
+//      }
+// }
+// else if x.peek().unwrap().to_string() == "import"{
+//      while x.peek().is_some(){
+//           x.next();
+//           result.push(
+//                [
+//                     "import".to_string(),
+//                     x.next().unwrap().to_string().replace(",", "")
+//                ].join(" ")
+//           )
+//      }
+// }
+// println!("{:?}", result);

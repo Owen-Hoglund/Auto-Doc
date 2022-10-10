@@ -28,14 +28,16 @@ pub fn receptionist(project_dir: String) {
 fn mimic_directories(files: &Vec<String>, parent_folder: &String, project_name: &String, project_folder: &String){
     // loops through files in the vector
     for file in files {
-        // creates the new altered path (details at function)
-        let new_file_directory: String = create_mimicked_path(&project_name, &parent_folder, &file);
+        if is_python(file) & !is_init(file){
+                // creates the new altered path (details at function)
+            let new_file_directory: String = create_mimicked_path(&project_name, &parent_folder, &file);
 
-        // Recursively creates the directory for the new path by making all the necessary parent folders
-        new_dir(&new_file_directory).expect("Could Not Create Directory");
+            // Recursively creates the directory for the new path by making all the necessary parent folders
+            new_dir(&new_file_directory).expect("Could Not Create Directory");
 
-        // Places new markdown file corresponding to the original file in the new directory 
-        create_file_in_mimicked_directory(&new_file_directory, &file, project_folder);
+            // Places new markdown file corresponding to the original file in the new directory 
+            create_file_in_mimicked_directory(&new_file_directory, &file, project_folder);
+        }
     }
 }
 
@@ -99,6 +101,13 @@ fn file_extraction(current_dir: String, files: &mut Vec<String>){
 // Primitive method of checking if a path represents a file. Very prone to error if a user has '.' in any folder names
 fn is_file(path: &String) -> bool{
     path.contains(".")
+}
+fn is_python(path: &String) -> bool{
+    path.contains(".py")
+}
+
+fn is_init(path: &String) -> bool{
+    path.contains("__init__")
 }
 
 // Returns the path of the folder one level above the directory passed in
