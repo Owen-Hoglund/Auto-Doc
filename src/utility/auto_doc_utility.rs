@@ -1,5 +1,5 @@
-use::std::fs::File;
-use::std::io::Read;
+use std::fs::File;
+use std::io::Read;
 
 pub fn file_splitter(path: &String) -> Vec<String>{
      // Opens the file that we want to create documentation for

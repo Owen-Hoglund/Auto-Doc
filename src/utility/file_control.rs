@@ -136,7 +136,8 @@ fn documentation_directory_creation(path: &String, project_name: &String) -> std
 // Takes a path and a path for that file and creates a markdown file in that place 
 fn create_file_in_mimicked_directory(file_path: &String, original_file: &String, project_folder: &String){
     let filename = filename(original_file);
-    let path = [file_path.to_string(), filename.to_string()].join("").replace(".py", "_guide.md");
+    let path = [file_path.to_string(), filename.to_string()].join("")
+                            .replace(".py", "_guide.md");
     {
         let mut file = OpenOptions::new()
                                 .write(true)

@@ -1,6 +1,5 @@
 use std::fs::OpenOptions;
 use std::io::prelude::*;
-use std::path::Path;
 use std::collections::HashMap;
 
 pub fn execute(functions: Vec<Vec<String>>, guide_file: &String, imports: &HashMap<String,String>){
