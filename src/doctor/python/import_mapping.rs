@@ -1,12 +1,14 @@
+use std::collections::HashMap;
+use std::path::Path;
+use crate::doctor::python::python_utility;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
-use std::path::Path;
-use std::collections::HashMap;
 
-pub fn execute(imports: Vec<String>, guide_file: &String, project_folder: &String) -> HashMap<String, String>{
+use super::python_utility::file_splitter;
+pub fn execute(imports: &Vec<String>, guide_file: &String, project_folder: &String) -> HashMap<String, String>{
     let mut import_map: HashMap<String, String> = HashMap::new();
     populate_hashmap(&mut import_map, &imports, project_folder);
-    write_imports(&import_map, &guide_file);
+    //write_imports(&import_map, &guide_file);
     import_map
 }
 
@@ -45,6 +47,7 @@ fn populate_hashmap(import_map: &mut HashMap<String,String>, imports: &Vec<Strin
             }
             let value = internal_link_generator(&import_source_to_obsidian_path(&source), &alias, &specific);
             import_map.insert(key, value);
+            imports_from_file(source_path, import_map, alias);
         }
     }
 }
@@ -78,33 +81,7 @@ fn internal_link_generator(path: &String, alias: &String, header: &String) -> St
         }
     }
 }
+fn imports_from_file(source_path: &Path, import_map: &mut HashMap<String,String>, alias: String){
+    let content = file_splitter(&source_path.to_str().unwrap().to_string());
 
-fn write_imports(import_map: &HashMap<String, String>, guide_file: &String){
-    let mut guide = OpenOptions::new()
-    .write(true)
-    .append(true)
-    .open(guide_file)
-    .unwrap();
-
-    if let Err(e) = writeln!(guide,
-        "## Imports"
-    ){eprintln!("Couldn't write to file: {}", e);}
-    if import_map.is_empty(){
-        if let Err(e) = write!(guide,
-            "This file does not import from any modules or libaries that AutoDoc could detect"
-        ){eprintln!("Couldn't write to file: {}", e);}
-    } else{
-        if let Err(e) = write!(guide,
-            "-"
-        ){eprintln!("Couldn't write to file: {}", e);}
-        for mapping in import_map{
-            if let Err(e) = write!(guide,
-                "{}, ", mapping.1,
-            ){eprintln!("Couldn't write to file: {}", e);}
-        }
-    }
-    if let Err(e) = write!(guide,
-        "\n"
-    ){eprintln!("Couldn't write to file: {}", e);}
-    
 }

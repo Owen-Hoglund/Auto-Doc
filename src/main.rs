@@ -1,7 +1,6 @@
-mod utility;
-
-
-fn main () {
+mod file_management;
+mod doctor;
+fn main() {
     let project_path = r"C:\Users\owenh\OneDrive\Documents\Coding\Projects\auto_doc_test_directory\project_name".to_string();
-    utility::file_control::receptionist(project_path);
+    file_management::file_control::execute(&project_path);
 }

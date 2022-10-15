@@ -1,9 +1,9 @@
 use std::fs::File;
 use std::io::Read;
+use crate::doctor::python::write_python;
 
 pub fn file_splitter(path: &String) -> Vec<String>{
      // Opens the file that we want to create documentation for
-     //let path = Path::new(r"C:\Users\owenh\OneDrive\Documents\Coding\Projects\auto_doc\test_files\dataBaseManager.py");
      let mut example_file = File::open(path).expect("Can't Open File");
      
      // Feeds the entire file into a string
@@ -14,7 +14,7 @@ pub fn file_splitter(path: &String) -> Vec<String>{
      let x = contents.split("\r\n").map(|x| x.to_string()).collect::<Vec<String>>();
 
      let mut result: Vec<String> = Vec::new();
-
+     
      for line in x{
           if non_empty_line(&line) {
                result.push(line.to_string());
@@ -36,7 +36,7 @@ fn non_empty_line(line: &String) -> bool{
      false
 }
 
-pub fn spacing_comparison(line: &String, spaces: usize) -> bool{
+pub fn spacing_comparison(line: &String, spaces: u8) -> bool{
      let mut space_count = 0;
      if line.chars().collect::<Vec<char>>()[0] == ')' {
           return true;
@@ -121,39 +121,61 @@ fn multi_import_splitter(import: String) -> Vec<String>{
 }
 
 
+pub fn parse_file(original_file_path: &String, guide_file: &String, project_folder: &String){
+     let content = file_splitter(original_file_path);
+     let imports = expanded_imports(python_parser(&content, "import", 0));
+     let classes = python_parser(&content, "class", 0);
+     let functions = python_parser(&content, "function", 0);
+     let variables = python_parser(&content, "variable", 0);
 
+     write_python::execute(imports, classes, functions, variables, guide_file, project_folder);
+ }
 
-
-
-
-
-
-
-// let mut result: Vec<String> = Vec::new();
-// let mut x = import.split_whitespace().peekable();
-// let mut source: Vec<String> = Vec::new();
-// if x.peek().unwrap().to_string() == "from"{
-//      source.push(x.next().unwrap().to_string());
-//      source.push(x.next().unwrap().to_string());
-//      let prefix = source.join(" ");
-//      while x.peek().is_some(){
-//           result.push(
-//                [
-//                     prefix.clone(),
-//                     x.next().unwrap().to_string().replace(",", "")
-//                ].join(" ")
-//           )
-//      }
-// }
-// else if x.peek().unwrap().to_string() == "import"{
-//      while x.peek().is_some(){
-//           x.next();
-//           result.push(
-//                [
-//                     "import".to_string(),
-//                     x.next().unwrap().to_string().replace(",", "")
-//                ].join(" ")
-//           )
-//      }
-// }
-// println!("{:?}", result);
+ fn python_parser(content: &Vec<String>, content_type: &str, spacing: u8) -> Vec<Vec<String>>{
+     let mut code_imports: Vec<Vec<String>> = Vec::new(); // This stores all import declarations in the file
+     let mut code_functions: Vec<Vec<String>> = Vec::new(); // This stores all function definitions in the file
+     let mut code_classes: Vec<Vec<String>> = Vec::new(); // This stores all class definitions in the file
+     let mut code_variables: Vec<Vec<String>> = Vec::new(); // This stores all global variable definitions in the file
+     let mut open_storage: Vec<String> = Vec::new(); // This temporarily stores code blocks for identification 
+     
+     let mut lines = content.iter(); // Creates an iterator for us to loop through 
+     open_storage.push(lines.next().expect("Line is not empty?").to_string()); // Pushes the first line of the file into temporary storage
+     
+     for line in lines{
+         if !is_comment(line){
+             if spacing_comparison(line, spacing){
+                 open_storage.push(line.to_string());
+             } else {
+                 let x = determine(&open_storage);
+                 let y = x.as_str();
+                 match y{
+                     "import" => code_imports.push(open_storage.clone()),
+                     "class" => code_classes.push(open_storage.clone()),
+                     "function" => code_functions.push(open_storage.clone()),
+                     "variable" => code_variables.push(open_storage.clone()),
+                     _ => panic!("This should not be possible! world is falling! determine always produces 1 of 4 strings"),
+                 }
+                 open_storage.clear();
+                 open_storage.push(line.to_string());
+             }
+         }
+     }
+     let x = determine(&open_storage);
+                 let y = x.as_str();
+                 match y{
+                     "import" => code_imports.push(open_storage.clone()),
+                     "class" => code_classes.push(open_storage.clone()),
+                     "function" => code_functions.push(open_storage.clone()),
+                     "variable" => code_variables.push(open_storage.clone()),
+                     _ => panic!("This should not be possible! world is falling! determine always produces 1 of 4 strings"),
+                 }
+                 open_storage.clear();
+     //println!("\nContent Type: {}\n", content_type);
+     match content_type{
+          "import" => code_imports,
+          "class" => code_classes,
+          "function" => code_functions,
+          "variable" => code_variables,
+          _ => panic!("Unsupported parsing type. Supported types are 'import', 'class', 'function', 'variable'.")
+     }
+ }

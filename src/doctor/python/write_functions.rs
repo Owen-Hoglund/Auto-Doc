@@ -2,13 +2,12 @@ use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::collections::HashMap;
 
-pub fn execute(functions: Vec<Vec<String>>, guide_file: &String, imports: &HashMap<String,String>){
+pub fn execute(imports: &HashMap<String,String>, functions:&Vec<Vec<String>>, guide_file: &String){
     for function in functions{
-        write_functions(function, guide_file, imports);
+        write_functions(function, guide_file, &imports);
     }
 }
-
-fn write_functions(function: Vec<String>, path: &String, imports: &HashMap<String,String>){
+fn write_functions(function: &Vec<String>, path: &String, imports: &HashMap<String,String>){
     let mut guide = OpenOptions::new()
     .write(true)
     .append(true)
