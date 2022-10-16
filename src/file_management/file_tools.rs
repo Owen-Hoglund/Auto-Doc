@@ -1,7 +1,7 @@
+use crate::doctor;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
-use crate::doctor;
 
 pub fn get_parent_directory(directory: &String) -> String {
     let mut dir = directory
@@ -133,8 +133,16 @@ fn create_mimicked_path(
 }
 
 // Returns File name at
-fn filename(file_path: &String) -> String{
-    let filename = file_path.split(r"\").map(|x| x.to_string()).collect::<Vec<String>>().iter().rev().next().unwrap().to_string();
+fn filename(file_path: &String) -> String {
+    let filename = file_path
+        .split(r"\")
+        .map(|x| x.to_string())
+        .collect::<Vec<String>>()
+        .iter()
+        .rev()
+        .next()
+        .unwrap()
+        .to_string();
     filename
 }
 
@@ -146,40 +154,37 @@ fn new_dir(path: &String) -> std::io::Result<()> {
 }
 
 // Creates documentation for a file in its proper path
-fn create_document_file(file_path: &String, original_file: &String, project_folder: &String){
+fn create_document_file(file_path: &String, original_file: &String, project_folder: &String) {
     let filename = filename(original_file);
     let mut file_suffix = String::new();
-    
+
     match language(&filename) {
         "Python" => file_suffix = ".py".to_string(),
         "C++" => file_suffix = ".cpp".to_string(),
         "Java Class" => file_suffix = ".class".to_string(),
-        _ => () 
+        _ => (),
     }
 
-
-    let path = [file_path.to_string(), filename.to_string()].join("")
-                            .replace(&file_suffix, "_guide.md");
+    let path = [file_path.to_string(), filename.to_string()]
+        .join("")
+        .replace(&file_suffix, "_guide.md");
     {
-        let mut file = OpenOptions::new()
-                                .write(true)
-                                .append(true)
-                                .create_new(true)
-                                .open(&path)
-                                .unwrap();
-        if let Err(e) = writeln!(file, 
-            "# {}", filename
-        ){eprintln!("Couldn't write to file: {}", e);}
+        let file = OpenOptions::new()
+            .write(true)
+            .append(true)
+            .create_new(true)
+            .open(&path)
+            .unwrap();
     }
     doctor::doctor::execute(&path, original_file, project_folder);
 }
 
-pub fn language(filename: &str) -> &str{
+pub fn language(filename: &str) -> &str {
     let x = filename.split(".").last().unwrap();
     match x {
         "py" => "Python",
         "cpp" => "C++",
         "class" => "Java Class",
-        _ => panic!("Unknown or unimplemented code file")
+        _ => panic!("Unknown or unimplemented code file"),
     }
 }
