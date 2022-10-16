@@ -1,19 +1,13 @@
 use std::collections::HashMap;
 use std::path::Path;
 use crate::doctor::python::python_utility;
-use std::fs::OpenOptions;
-use std::io::prelude::*;
-
-use super::python_utility::file_splitter;
-pub fn execute(imports: &Vec<String>, guide_file: &String, project_folder: &String) -> HashMap<String, String>{
+pub fn populate_hashmap( imports: &Vec<String>, project_folder: &String) -> HashMap<String, String>{
+    // Creates a placeholder to return
     let mut import_map: HashMap<String, String> = HashMap::new();
-    populate_hashmap(&mut import_map, &imports, project_folder);
-    //write_imports(&import_map, &guide_file);
-    import_map
-}
-
-fn populate_hashmap(import_map: &mut HashMap<String,String>, imports: &Vec<String>, project_folder: &String){
+    // Begin iterating over imports in the vector of imports
     for import in imports{
+
+        // Some variables used for determining the import style
         let mut source: String = String::new();
         let mut specific: String = String::new();
         let mut alias: String = String::new();
@@ -35,8 +29,12 @@ fn populate_hashmap(import_map: &mut HashMap<String,String>, imports: &Vec<Strin
                 _ => println!("Critical Error, Builder has reached unreachable state"),
             }
         }
-
+        
+        // Converts the python source to an actual path (import HamSandwich.IOUtils -> C::\Users\....\HamSandwich\IOUtils.py)
         let temp = python_source_to_path(&source, project_folder);
+
+        // Converts this to an 'real' Path so that we can check if that path exists locally.
+        // This is crucial for determining whether or not the import is from an external or user defined source
         let source_path= Path::new(&temp);
         if source_path.exists() {
             let mut key:String = String::new();
@@ -46,11 +44,72 @@ fn populate_hashmap(import_map: &mut HashMap<String,String>, imports: &Vec<Strin
                 key = alias.clone();
             }
             let value = internal_link_generator(&import_source_to_obsidian_path(&source), &alias, &specific);
-            import_map.insert(key, value);
-            imports_from_file(source_path, import_map, alias);
+            import_map.insert(key, value.clone());
+            
+            //imports_from_file();
         }
     }
+    import_map
 }
+
+
+fn imports_from_file(alias: &String, header: &String, source_path: &Path){
+    let content = python_utility::file_splitter(&source_path.to_str().unwrap().to_string());
+    let classes = python_utility::python_parser(&content, "class", 0);
+    let functions = python_utility::python_parser(&content, "function", 0);
+    
+    for class in classes{
+        let name = python_utility::class_name(&class[0]);
+        //import_map.insert(k, )
+        println!("{}", name);
+    }
+
+}
+
+
+
+
+pub fn expanded_imports(imports_section: Vec<Vec<String>>) -> Vec<String>{
+    // Merges the import lines into 1d Vec with each import line comprising an element of the vector
+    let mut temp_imports: Vec<String> = Vec::new();
+    let mut imports: Vec<String> = Vec::new();
+    for line in imports_section{
+         temp_imports.push(line[0].clone());
+    }
+    for line in temp_imports{
+         if line.contains(","){
+              for x in multi_import_splitter(line){
+                   imports.push(x);
+              }
+         }
+         else if line.contains("*"){
+              imports.push(import_all_fixer(&line));
+         }
+         else {
+              imports.push(line);
+         }
+    }
+    imports
+}
+
+fn multi_import_splitter(import: String) -> Vec<String>{
+    let mut result:Vec<String> = Vec::new();
+    let y = &import.split_whitespace().map(|x| x.to_string()).collect::<Vec<String>>();
+    let iter = &y[3..];
+    for i in iter{
+         result.push(["from ".to_string(), y[1].to_string(), " import ".to_string(), i.to_string()].join(""));
+    }
+    result
+}
+
+fn import_all_fixer(import: &String) -> String{
+    let temp:Vec<String> = import.split_whitespace().map(|x| x.to_string()).rev().collect::<Vec<String>>();
+    //println!("TEST 2: {:?}", temp);
+    let x = temp.join(" ").replace("* ", "").replace(" from", "");
+    //println!("{}", x);
+    x
+}
+
 
 
 fn python_source_to_path(import: &String, project_folder: &String) -> String{
@@ -64,9 +123,10 @@ fn import_source_to_obsidian_path(import: &String) -> String{
 }
 
 fn internal_link_generator(path: &String, alias: &String, header: &String) -> String{
+    let filename = path.split("/").collect::<Vec<&str>>().last().unwrap().to_string();
     if header.is_empty(){
         if alias.is_empty(){
-            format!("[[{}_guide]]", path)
+            format!("[[{}_guide|{}]]", path, filename)
         }
         else {
             format!("[[{}_guide|{}]]", path, alias)
@@ -74,14 +134,11 @@ fn internal_link_generator(path: &String, alias: &String, header: &String) -> St
     }
     else {
         if alias.is_empty(){
-            format!("[[{}_guide#{}]]", path, header)
+            format!("[[{}_guide#{}|{}]]", path, header, filename)
         }
         else {
             format!("[[{}_guide#{}|{}]]", path, header, alias)
         }
     }
 }
-fn imports_from_file(source_path: &Path, import_map: &mut HashMap<String,String>, alias: String){
-    let content = file_splitter(&source_path.to_str().unwrap().to_string());
 
-}

@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::Read;
-use crate::doctor::python::write_python;
 
 pub fn file_splitter(path: &String) -> Vec<String>{
      // Opens the file that we want to create documentation for
@@ -78,60 +77,7 @@ pub fn is_comment(line: &String) -> bool{
     return false;
 }
 
-
-pub fn expanded_imports(imports_section: Vec<Vec<String>>) -> Vec<String>{
-     // Merges the import lines into 1d Vec with each import line comprising an element of the vector
-     let mut temp_imports: Vec<String> = Vec::new();
-     let mut imports: Vec<String> = Vec::new();
-     for line in imports_section{
-          temp_imports.push(line[0].clone());
-     }
-     for line in temp_imports{
-          if line.contains(","){
-               for x in multi_import_splitter(line){
-                    imports.push(x);
-               }
-          }
-          else if line.contains("*"){
-               imports.push(import_all_fixer(&line));
-          }
-          else {
-               imports.push(line);
-          }
-     }
-     imports
-}
-
-fn import_all_fixer(import: &String) -> String{
-     let temp:Vec<String> = import.split_whitespace().map(|x| x.to_string()).rev().collect::<Vec<String>>();
-     //println!("TEST 2: {:?}", temp);
-     let x = temp.join(" ").replace("* ", "").replace(" from", "");
-     //println!("{}", x);
-     x
-}
-
-fn multi_import_splitter(import: String) -> Vec<String>{
-     let mut result:Vec<String> = Vec::new();
-     let y = &import.split_whitespace().map(|x| x.to_string()).collect::<Vec<String>>();
-     let iter = &y[3..];
-     for i in iter{
-          result.push(["from ".to_string(), y[1].to_string(), " import ".to_string(), i.to_string()].join(""));
-     }
-     result
-}
-
-
-pub fn parse_file(original_file_path: &String, guide_file: &String, project_folder: &String){
-     let content = file_splitter(original_file_path);
-     let imports = expanded_imports(python_parser(&content, "import", 0));
-     let classes = python_parser(&content, "class", 0);
-     let functions = python_parser(&content, "function", 0);
-     let variables = python_parser(&content, "variable", 0);
-
-     write_python::execute(imports, classes, functions, variables, guide_file, project_folder);
- }
-
- fn python_parser(content: &Vec<String>, content_type: &str, spacing: u8) -> Vec<Vec<String>>{
+ pub fn python_parser(content: &Vec<String>, content_type: &str, spacing: u8) -> Vec<Vec<String>>{
      let mut code_imports: Vec<Vec<String>> = Vec::new(); // This stores all import declarations in the file
      let mut code_functions: Vec<Vec<String>> = Vec::new(); // This stores all function definitions in the file
      let mut code_classes: Vec<Vec<String>> = Vec::new(); // This stores all class definitions in the file
@@ -178,4 +124,16 @@ pub fn parse_file(original_file_path: &String, guide_file: &String, project_fold
           "variable" => code_variables,
           _ => panic!("Unsupported parsing type. Supported types are 'import', 'class', 'function', 'variable'.")
      }
+ }
+
+ pub fn class_name(declaration: &String) -> String{
+     declaration.split_whitespace()
+               .collect::<Vec<&str>>()[1]
+               .chars().filter(|x| x != &':')
+               .collect::<Vec<char>>()
+               .into_iter()
+               .collect::<String>()
+               .split("(")
+               .collect::<Vec<&str>>()[0]
+               .to_string()
  }

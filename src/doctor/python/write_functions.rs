@@ -24,24 +24,27 @@ fn write_functions(function: &Vec<String>, path: &String, imports: &HashMap<Stri
     let mut import_links: Vec<String> = Vec::new();
 
     for mapping in imports{
+        if let Err(e) = write!(guide,
+                         "{}, ", mapping.1,
+        ){eprintln!("Couldn't write to file: {}", e);}
         if contents.contains(mapping.0){
             import_links.push(mapping.1.to_string());
         } 
     }
-    if import_links.is_empty(){
-        if let Err(e) = writeln!(guide,
-            "### Reliances\nThis Function has no local module/library reliances AutoDoc could detect"
-        ){eprintln!("Couldn't write to file: {}", e);}
-    } else {
-        if let Err(e) = write!(guide,
-            "-"
-        ){eprintln!("Couldn't write to file: {}", e);}
-        for link in import_links{
-            if let Err(e) = write!(guide,
-                "{}, ", link,
-            ){eprintln!("Couldn't write to file: {}", e);}
-        }
-    }
+    // if import_links.is_empty(){
+    //     if let Err(e) = writeln!(guide,
+    //         "### Reliances\nThis Function has no local module/library reliances AutoDoc could detect"
+    //     ){eprintln!("Couldn't write to file: {}", e);}
+    // } else {
+    //     if let Err(e) = write!(guide,
+    //         "-"
+    //     ){eprintln!("Couldn't write to file: {}", e);}
+    //     for link in import_links{
+    //         if let Err(e) = write!(guide,
+    //             "{}, ", link,
+    //         ){eprintln!("Couldn't write to file: {}", e);}
+    //     }
+    // }
     if let Err(e) = write!(guide,
         "\n"
     ){eprintln!("Couldn't write to file: {}", e);}
